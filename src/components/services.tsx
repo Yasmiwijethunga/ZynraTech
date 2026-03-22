@@ -8,7 +8,13 @@ const ServiceCard = ({ icon, title, description, color, onLearnMore }: { icon: R
     return (
         <div className="glass group p-8 rounded-2xl transition-all duration-300 hover:translate-y-[-8px] hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/10 flex flex-col items-start text-left">
             <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 bg-slate-800/50 group-hover:scale-110`}>
-                <div className={`text-${color}`}>
+                <div className={
+                    color === 'primary' ? 'text-primary' :
+                    color === 'secondary' ? 'text-secondary' :
+                    color === 'accent' ? 'text-accent' :
+                    color === 'emerald-400' ? 'text-emerald-400' :
+                    color === 'rose-400' ? 'text-rose-400' : ''
+                }>
                     {icon}
                 </div>
             </div>
@@ -72,7 +78,13 @@ const ServiceDetailModal = ({ isOpen, onClose, service }: { isOpen: boolean, onC
                     <div className="flex flex-col md:flex-row gap-12 items-start">
                         {/* Left Column: Icon & Title */}
                         <div className="w-full md:w-1/3">
-                            <div className={`w-20 h-20 rounded-2xl bg-slate-800/50 flex items-center justify-center mb-8 text-${service.color} shadow-xl shadow-${service.color}/10`}>
+                            <div className={`w-20 h-20 rounded-2xl bg-slate-800/50 flex items-center justify-center mb-8 shadow-xl ${
+                                service.color === 'primary' ? 'text-primary shadow-primary/10' :
+                                service.color === 'secondary' ? 'text-secondary shadow-secondary/10' :
+                                service.color === 'accent' ? 'text-accent shadow-accent/10' :
+                                service.color === 'emerald-400' ? 'text-emerald-400 shadow-emerald-400/10' :
+                                service.color === 'rose-400' ? 'text-rose-400 shadow-rose-400/10' : ''
+                            }`}>
                                 {service.icon}
                             </div>
                             <h2 className="text-4xl font-black text-white mb-4 leading-tight">{service.title}</h2>
