@@ -62,55 +62,6 @@ function IconTerminal() {
 
 // ── Google Map Component ─────────────────────────────────────────────────────
 
-// ── ENHANCEMENTS v2.0 ────────────────────────────────────────────────────────
-
-const MagneticWrapper = ({ children, strength = 30 }: { children: React.ReactNode, strength?: number }) => {
-  const ref = useRef<HTMLDivElement>(null);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const { left, top, width, height } = ref.current.getBoundingClientRect();
-    const x = e.clientX - (left + width / 2);
-    const y = e.clientY - (top + height / 2);
-    ref.current.style.transform = `translate(${x / strength}px, ${y / strength}px)`;
-  };
-
-  const handleMouseLeave = () => {
-    if (!ref.current) return;
-    ref.current.style.transform = "translate(0, 0)";
-  };
-
-  return (
-    <div 
-      ref={ref} 
-      onMouseMove={handleMouseMove} 
-      onMouseLeave={handleMouseLeave} 
-      style={{ transition: "transform 0.1s ease-out" }}
-    >
-      {children}
-    </div>
-  );
-};
-
-const useScrollReveal = () => {
-  const [revealed, setRevealed] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setRevealed(true);
-        observer.disconnect();
-      }
-    }, { threshold: 0.1 });
-
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return { ref, revealed };
-};
-
 const GoogleMap = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -142,31 +93,35 @@ const GoogleMap = () => {
         mapId: "ZYMRA_MAP_ID", 
         disableDefaultUI: true,
         styles: [
-          { "elementType": "geometry", "stylers": [{ "color": "#060d1f" }] },
-          { "elementType": "labels.text.fill", "stylers": [{ "color": "#4a5a7a" }] },
-          { "elementType": "labels.text.stroke", "stylers": [{ "color": "#060d1f" }] },
-          { "featureType": "administrative", "elementType": "geometry.stroke", "stylers": [{ "color": "#1a2a4a" }] },
-          { "featureType": "landscape", "elementType": "geometry.fill", "stylers": [{ "color": "#0d1f3c" }] },
-          { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#1a2a4a" }] },
-          { "featureType": "road", "elementType": "geometry.stroke", "stylers": [{ "color": "#060d1f" }] },
-          { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#020817" }] }
+          {
+            "elementType": "all",
+            "stylers": [
+              { "saturation": -100 },
+              { "lightness": -70 },
+              { "visibility": "simplified" }
+            ]
+          },
+          {
+            "elementType": "labels.text.fill",
+            "stylers": [{ "color": "#4a5a7a" }]
+          },
+          {
+            "featureType": "water",
+            "elementType": "geometry",
+            "stylers": [{ "color": "#020817" }]
+          },
+          {
+            "featureType": "road",
+            "elementType": "geometry",
+            "stylers": [{ "color": "#0d1f3c" }, { "visibility": "simplified" }]
+          }
         ]
       });
-
-      // Custom Neural Marker
-      const pinSvg = document.createElement("div");
-      pinSvg.innerHTML = `
-        <div style="position: relative; width: 40px; height: 40px;">
-          <div style="position: absolute; inset: 0; background: rgba(0, 212, 255, 0.2); border: 2px solid var(--cyan); border-radius: 50%; animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
-          <div style="position: absolute; inset: 10px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 15px var(--cyan);"></div>
-        </div>
-      `;
 
       new AdvancedMarkerElement({
         map: map,
         position: position,
-        title: "ZYNRA HQ",
-        content: pinSvg
+        title: "ZYMRA HQ",
       });
     }).catch(e => {
       console.error("Map load error:", e);
@@ -329,18 +284,15 @@ const NeuralBackground = () => {
   }, []);
 
   return (
-    <canvas 
-      ref={canvasRef} 
-      style={{ 
-        position: "absolute", 
-        top: 0, 
-        left: 0, 
-        width: "100%", 
-        height: "100%", 
-        pointerEvents: "none", 
-        opacity: 0.4,
-        zIndex: 0
-      }} 
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "fixed",
+        inset: 0,
+        pointerEvents: "none",
+        zIndex: 0,
+        opacity: 0.1, // Reduced for "correctness" vs static UI
+      }}
     />
   );
 };
@@ -394,17 +346,6 @@ const Contact = () => {
 
   const [mounted, setMounted] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(true);
-  const [copyStatus, setCopyStatus] = useState<string | null>(null);
-
-  const { ref: headerRef, revealed: headerRevealed } = useScrollReveal();
-  const { ref: mainRef, revealed: mainRevealed } = useScrollReveal();
-  const { ref: mapSectionRef, revealed: mapRevealed } = useScrollReveal();
-
-  const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    setCopyStatus(label);
-    setTimeout(() => setCopyStatus(null), 3000);
-  };
 
   useEffect(() => {
     setMounted(true);
@@ -458,46 +399,8 @@ const Contact = () => {
         zIndex: 1
       }} />
 
-      <div 
-        ref={headerRef}
-        style={{ 
-          maxWidth: "1200px", 
-          margin: "0 auto", 
-          position: "relative", 
-          zIndex: 10,
-          opacity: headerRevealed ? 1 : 0,
-          transform: `translateY(${headerRevealed ? 0 : 40}px)`,
-          transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)"
-        }}
-      >
+      <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 10 }}>
         
-        {/* HUD NOTIFICATION */}
-        {copyStatus && (
-          <div style={{
-            position: "fixed",
-            top: "100px",
-            right: "40px",
-            background: "#00d4ff",
-            color: "#060d1f",
-            padding: "12px 24px",
-            borderRadius: "4px",
-            fontSize: "10px",
-            fontWeight: 900,
-            letterSpacing: "2px",
-            zIndex: 1000,
-            boxShadow: "0 0 30px rgba(0, 212, 255, 0.5)",
-            animation: "slideIn 0.3s ease-out"
-          }}>
-            [ DATA STORED ] : {copyStatus}
-            <style jsx>{`
-              @keyframes slideIn {
-                from { opacity: 0; transform: translateX(20px); }
-                to { opacity: 1; transform: translateX(0); }
-              }
-            `}</style>
-          </div>
-        )}
-
         {/* ── HEADER ─────────────────────────────────────────────────────── */}
         <div style={{ 
           marginBottom: "80px",
@@ -540,16 +443,7 @@ const Contact = () => {
         </div>
 
         {/* ── MAIN CONTENT ────────────────────────────────────────────────── */}
-        <div 
-          ref={mainRef}
-          className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-0 mb-16" 
-          style={{ 
-            border: "1px dashed rgba(0, 212, 255, 0.2)",
-            opacity: mainRevealed ? 1 : 0,
-            transform: `translateY(${mainRevealed ? 0 : 40}px)`,
-            transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s"
-          }}
-        >
+        <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-0 mb-16" style={{ border: "1px dashed rgba(0, 212, 255, 0.2)" }}>
           
           {/* Left: Form */}
           <div className="p-8 md:p-14" style={{
@@ -602,11 +496,13 @@ const Contact = () => {
                   <label style={{ fontSize: "9px", fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "2px" }}>Operator Identity</label>
                   <input 
                     type="text" 
-                    placeholder="Full Name" 
-                    className="form-input"
-                    style={{ background: "rgba(255, 255, 255, 0.02)", height: "54px", border: "1px solid rgba(0, 212, 255, 0.1)" }}
+                    name="name"
+                    placeholder="Full Name"
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    style={{ background: "#030816", height: "54px", border: "1px solid rgba(0, 212, 255, 0.1)", color: "#ffffff", padding: "0 16px", borderRadius: "4px", width: "100%", fontSize: "14px", transition: "all 0.3s ease" }}
+                    onFocus={(e) => e.target.style.border = "1px solid var(--cyan)"}
+                    onBlur={(e) => e.target.style.border = "1px solid rgba(0, 212, 255, 0.1)"}
                     required
                   />
                 </div>
@@ -614,11 +510,13 @@ const Contact = () => {
                   <label style={{ fontSize: "9px", fontWeight: 800, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "2px" }}>Data Protocol</label>
                   <input 
                     type="email" 
-                    placeholder="Email Address" 
-                    className="form-input"
-                    style={{ background: "rgba(255, 255, 255, 0.02)", height: "54px", border: "1px solid rgba(0, 212, 255, 0.1)" }}
+                    name="email"
+                    placeholder="Email Address"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    style={{ background: "#030816", height: "54px", border: "1px solid rgba(0, 212, 255, 0.1)", color: "#ffffff", padding: "0 16px", borderRadius: "4px", width: "100%", fontSize: "14px", transition: "all 0.3s ease" }}
+                    onFocus={(e) => e.target.style.border = "1px solid var(--cyan)"}
+                    onBlur={(e) => e.target.style.border = "1px solid rgba(0, 212, 255, 0.1)"}
                     required
                   />
                 </div>
@@ -629,9 +527,11 @@ const Contact = () => {
                 <div style={{ position: "relative" }}>
                   <select 
                     className="form-input"
-                    style={{ appearance: "none", background: "rgba(255, 255, 255, 0.02)", height: "54px", border: "1px solid rgba(0, 212, 255, 0.1)" }}
+                    style={{ appearance: "none", background: "#030816", height: "54px", border: "1px solid rgba(0, 212, 255, 0.1)", color: "#ffffff", padding: "0 16px", borderRadius: "4px", width: "100%", fontSize: "14px", transition: "all 0.3s ease" }}
                     value={formData.subject}
                     onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                    onFocus={(e) => e.target.style.border = "1px solid var(--cyan)"}
+                    onBlur={(e) => e.target.style.border = "1px solid rgba(0, 212, 255, 0.1)"}
                   >
                     <option>Neural Interface Development</option>
                     <option>Ecosystem Integration</option>
@@ -648,43 +548,42 @@ const Contact = () => {
                   placeholder="Describe your objective..." 
                   className="form-input"
                   rows={5}
-                  style={{ resize: "none", background: "rgba(255, 255, 255, 0.02)", padding: "20px", border: "1px solid rgba(0, 212, 255, 0.1)" }}
+                  style={{ resize: "none", background: "#030816", padding: "20px", border: "1px solid rgba(0, 212, 255, 0.1)", color: "#ffffff", borderRadius: "4px", width: "100%", fontSize: "14px", transition: "all 0.3s ease" }}
                   value={formData.message}
                   onChange={(e) => setFormData({...formData, message: e.target.value})}
+                  onFocus={(e) => e.target.style.border = "1px solid var(--cyan)"}
+                  onBlur={(e) => e.target.style.border = "1px solid rgba(0, 212, 255, 0.1)"}
                   required
                 />
               </div>
 
-              <MagneticWrapper>
-                <button 
-                  type="submit" 
-                  style={{ 
-                    marginTop: "8px", 
-                    background: "linear-gradient(90deg, #5eb5ff, #00d4ff, #5effd4)", 
-                    color: "#060d1f",
-                    padding: "20px",
-                    fontSize: "14px",
-                    borderRadius: "6px",
-                    fontWeight: 950,
-                    textTransform: "uppercase",
-                    letterSpacing: "3px",
-                    transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-                    border: "none",
-                    cursor: "pointer",
-                    width: "100%"
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow = "0 10px 40px rgba(0, 212, 255, 0.4)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                >
-                  Transmit Data
-                </button>
-              </MagneticWrapper>
+              <button 
+                type="submit" 
+                style={{ 
+                  marginTop: "8px", 
+                  background: "linear-gradient(90deg, #5eb5ff, #00d4ff, #5effd4)", 
+                  color: "#060d1f",
+                  padding: "20px",
+                  fontSize: "14px",
+                  borderRadius: "6px",
+                  fontWeight: 950,
+                  textTransform: "uppercase",
+                  letterSpacing: "3px",
+                  transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+                  border: "none",
+                  cursor: "pointer"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 10px 40px rgba(0, 212, 255, 0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              >
+                Transmit Data
+              </button>
             </form>
           </div>
 
@@ -693,22 +592,17 @@ const Contact = () => {
             display: "flex", 
             flexDirection: "column", 
             gap: "0",
-            background: "rgba(4, 11, 24, 0.9)",
-            padding: "40px 32px"
+            background: "rgba(4, 11, 24, 1)",
+            padding: "0"
           }}>
             
-            <TiltCard>
-              <div 
-                onClick={() => copyToClipboard("nexus@zynratech.io", "EMAIL")}
-                style={{
-                  padding: "32px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "24px",
-                  borderBottom: "1px dashed rgba(255,255,255,0.05)",
-                  cursor: "pointer"
-                }}
-              >
+            <TiltCard style={{ borderBottom: "1px dashed rgba(255,255,255,0.05)" }}>
+              <div style={{
+                padding: "40px 32px",
+                display: "flex",
+                alignItems: "center",
+                gap: "24px",
+              }}>
                 <div style={{
                   width: "56px",
                   height: "56px",
@@ -724,23 +618,17 @@ const Contact = () => {
                 <div>
                   <div style={{ fontSize: "9px", fontWeight: 800, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "2px", marginBottom: "6px" }}>Neural Link</div>
                   <div style={{ fontSize: "16px", color: "#ffffff", fontWeight: 700 }}>nexus@zynratech.io</div>
-                  <div style={{ fontSize: "8px", color: "var(--cyan)", opacity: 0.5, marginTop: "4px" }}>CLICK TO COPY</div>
                 </div>
               </div>
             </TiltCard>
 
-            <TiltCard>
-              <div 
-                onClick={() => copyToClipboard("+1 (888) 505-ZYNRA", "PHONE")}
-                style={{
-                  padding: "32px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "24px",
-                  borderBottom: "1px dashed rgba(255,255,255,0.05)",
-                  cursor: "pointer"
-                }}
-              >
+            <TiltCard style={{ borderBottom: "1px dashed rgba(255,255,255,0.05)" }}>
+              <div style={{
+                padding: "40px 32px",
+                display: "flex",
+                alignItems: "center",
+                gap: "24px",
+              }}>
                 <div style={{
                   width: "56px",
                   height: "56px",
@@ -756,18 +644,16 @@ const Contact = () => {
                 <div>
                   <div style={{ fontSize: "9px", fontWeight: 800, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "2px", marginBottom: "6px" }}>Central Uplink</div>
                   <div style={{ fontSize: "16px", color: "#ffffff", fontWeight: 700 }}>+1 (888) 505-ZYNRA</div>
-                  <div style={{ fontSize: "8px", color: "var(--cyan)", opacity: 0.5, marginTop: "4px" }}>CLICK TO COPY</div>
                 </div>
               </div>
             </TiltCard>
 
-            <TiltCard>
+            <TiltCard style={{ borderBottom: "1px dashed rgba(255,255,255,0.05)" }}>
               <div style={{
-                padding: "32px",
+                padding: "40px 32px",
                 display: "flex",
                 alignItems: "center",
                 gap: "24px",
-                borderBottom: "1px dashed rgba(255,255,255,0.05)"
               }}>
                 <div style={{
                   width: "56px",
@@ -793,40 +679,41 @@ const Contact = () => {
 
             {/* Global Sync Card */}
             <div style={{
-              padding: "32px",
+              padding: "40px 32px",
               display: "flex",
               flexDirection: "column",
-              gap: "24px"
+              gap: "24px",
+              borderTop: "1px dashed rgba(255,255,255,0.05)"
             }}>
               <div style={{ fontSize: "9px", fontWeight: 800, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "2px" }}>Global Sync</div>
-              <div style={{ display: "flex", gap: "16px" }}>
-                {[IconGlobe, IconShare, IconTerminal].map((Icon, idx) => (
-                  <div key={idx} style={{
-                    width: "48px",
-                    height: "48px",
-                    borderRadius: "6px",
-                    background: "rgba(255,255,255,0.02)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    display: "flex",
-                    alignItems: "center",
+              <div style={{ display: "flex", gap: "12px" }}>
+                {[IconGlobe, IconGlobe, IconShare].map((Icon, i) => (
+                  <div key={i} style={{ 
+                    width: "40px", 
+                    height: "40px", 
+                    borderRadius: "50%", 
+                    border: "1px solid rgba(255,255,255,0.1)", 
+                    display: "flex", 
+                    alignItems: "center", 
                     justifyContent: "center",
                     color: "rgba(255,255,255,0.4)",
                     cursor: "pointer",
                     transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(0, 212, 255, 0.1)";
-                    e.currentTarget.style.borderColor = "var(--cyan)";
-                    e.currentTarget.style.color = "var(--cyan)";
-                    e.currentTarget.style.transform = "scale(1.1) translateY(-2px)";
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.background = "rgba(0, 212, 255, 0.1)";
+                    el.style.borderColor = "var(--cyan)";
+                    el.style.color = "var(--cyan)";
+                    el.style.transform = "scale(1.1) translateY(-2px)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.02)";
-                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
-                    e.currentTarget.style.color = "rgba(255,255,255,0.4)";
-                    e.currentTarget.style.transform = "scale(1) translateY(0)";
-                  }}
-                  >
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.background = "rgba(255,255,255,0.02)";
+                    el.style.borderColor = "rgba(255,255,255,0.08)";
+                    el.style.color = "rgba(255,255,255,0.4)";
+                    el.style.transform = "scale(1) translateY(0)";
+                  }}>
                     <Icon />
                   </div>
                 ))}
@@ -837,21 +724,15 @@ const Contact = () => {
         </div>
 
         {/* ── MAP SECTION ────────────────────────────────────────────────── */}
-        <div 
-          ref={mapSectionRef}
-          style={{
-            position: "relative",
-            borderRadius: "4px",
-            overflow: "hidden",
-            border: "1px dashed rgba(0, 212, 255, 0.3)",
-            height: "480px",
-            padding: "16px",
-            background: "rgba(6, 13, 31, 1)",
-            opacity: mapRevealed ? 1 : 0,
-            transform: `translateY(${mapRevealed ? 0 : 40}px)`,
-            transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s"
-          }}
-        >
+        <div style={{
+          position: "relative",
+          borderRadius: "4px",
+          overflow: "hidden",
+          border: "1px dashed rgba(0, 212, 255, 0.3)",
+          height: "480px",
+          padding: "16px",
+          background: "rgba(6, 13, 31, 1)"
+        }}>
           <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: "4px", overflow: "hidden" }}>
              <GoogleMap />
           </div>

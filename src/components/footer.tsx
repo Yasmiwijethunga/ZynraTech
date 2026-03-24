@@ -3,9 +3,8 @@
 import Link from "next/link";
 
 const footerLinks = {
-  ECOSYSTEM: ["Team Model", "Neural Grid", "Sponsored AI"],
-  NETWORK: ["Global Services", "Gateway Nodes", "White Nodes"],
-  PROTOCOL: ["Privacy Policy", "Terms of Service", "Cookie Settings"],
+  DIRECTORY: ["Privacy Policy", "Terms of Service"],
+  OPERATIONS: ["Cookie Settings", "Global Careers"],
 };
 
 export default function Footer() {
@@ -21,7 +20,7 @@ export default function Footer() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "2fr 1fr 1fr 1fr",
+            gridTemplateColumns: "1.5fr 1fr 1fr 1.2fr",
             gap: "48px",
             paddingBottom: "48px",
             borderBottom: "1px solid rgba(255,255,255,0.06)",
@@ -39,45 +38,19 @@ export default function Footer() {
                 marginBottom: "16px",
               }}
             >
-              ZYNRA<span style={{ color: "var(--cyan)" }}>TECH</span>
+              Zynra<span style={{ color: "var(--cyan)" }}>Tech</span>
             </div>
             <p
               style={{
-                fontSize: "13px",
+                fontSize: "12px",
                 lineHeight: 1.8,
-                color: "rgba(255,255,255,0.4)",
+                color: "rgba(255,255,255,0.25)",
                 maxWidth: "240px",
-                marginBottom: "24px",
+                marginBottom: "0",
               }}
             >
-              Building neural interface systems and scalable software ecosystems for the next generation.
+              © 2024 ZYNRATECH. NEURAL INTERFACE SYSTEMS.
             </p>
-            {/* Social Icons */}
-            <div style={{ display: "flex", gap: "12px" }}>
-              {["X", "in", "gh"].map((s) => (
-                <Link
-                  key={s}
-                  href="#"
-                  style={{
-                    width: "34px",
-                    height: "34px",
-                    borderRadius: "8px",
-                    background: "rgba(0,212,255,0.06)",
-                    border: "1px solid rgba(0,212,255,0.15)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "rgba(255,255,255,0.6)",
-                    fontSize: "12px",
-                    fontWeight: 700,
-                    textDecoration: "none",
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  {s}
-                </Link>
-              ))}
-            </div>
           </div>
 
           {/* Link columns */}
@@ -85,24 +58,24 @@ export default function Footer() {
             <div key={title}>
               <h4
                 style={{
-                  fontSize: "11px",
-                  fontWeight: 700,
+                  fontSize: "10px",
+                  fontWeight: 800,
                   letterSpacing: "2.5px",
-                  color: "rgba(255,255,255,0.5)",
+                  color: "rgba(255,255,255,0.4)",
                   textTransform: "uppercase",
                   marginBottom: "20px",
                 }}
               >
                 {title}
               </h4>
-              <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "12px" }}>
+              <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "10px" }}>
                 {links.map((link) => (
                   <li key={link}>
                     <Link
                       href="#"
                       style={{
-                        fontSize: "13px",
-                        color: "rgba(255,255,255,0.45)",
+                        fontSize: "12px",
+                        color: "rgba(255,255,255,0.3)",
                         textDecoration: "none",
                         transition: "color 0.2s ease",
                       }}
@@ -111,7 +84,7 @@ export default function Footer() {
                       }
                       onMouseLeave={(e) =>
                         ((e.target as HTMLElement).style.color =
-                          "rgba(255,255,255,0.45)")
+                          "rgba(255,255,255,0.3)")
                       }
                     >
                       {link}
@@ -121,6 +94,38 @@ export default function Footer() {
               </ul>
             </div>
           ))}
+
+          {/* Neural Feed col */}
+          <div>
+            <h4
+              style={{
+                fontSize: "10px",
+                fontWeight: 800,
+                letterSpacing: "2.5px",
+                color: "rgba(255,255,255,0.4)",
+                textTransform: "uppercase",
+                marginBottom: "20px",
+              }}
+            >
+              NEURAL FEED
+            </h4>
+            <div style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "4px",
+              padding: "16px",
+              display: "flex",
+              alignItems: "center",
+              gap: "12px"
+            }}>
+              <div style={{ width: "24px", height: "24px", borderRadius: "4px", background: "rgba(0, 212, 255, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--cyan)" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+              </div>
+              <div style={{ fontSize: "10px", fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "1px" }}>
+                V4.0.2 STABLE CORE
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Bottom bar */}
@@ -134,10 +139,7 @@ export default function Footer() {
             gap: "12px",
           }}
         >
-          <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.25)" }}>
-            © {new Date().getFullYear()} ZynraTech. All systems operational.
-          </p>
-          <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.2)" }}>
+          <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.15)" }}>
             Engineered for the next generation
           </p>
         </div>

@@ -5,18 +5,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "Contact", href: "#contact" },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/#about" },
+  { label: "Services", href: "/services" },
+  { label: "Portfolio", href: "/#portfolio" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeLink, setActiveLink] = useState("Home");
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -25,8 +24,9 @@ export default function Navbar() {
   }, []);
 
   const isActive = (href: string) => {
+    if (href === "/contact") return pathname === "/contact";
     if (href === "/") return pathname === "/";
-    return pathname.startsWith(href.split("#")[0]) && href.split("#")[0] !== "/";
+    return false; // For hash links on other pages, it's more complex, but this covers the basics
   };
 
   return (
@@ -77,36 +77,35 @@ export default function Navbar() {
           style={{ display: "flex", alignItems: "center", gap: "36px" }}
           className="hidden-mobile"
         >
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              onClick={() => setActiveLink(link.label)}
-              style={{
-                fontSize: "14px",
-                fontWeight: 500,
-                textDecoration: "none",
-                color:
-                  activeLink === link.label
+          {navLinks.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.label}
+                href={link.href}
+                style={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  textDecoration: "none",
+                  color: active
                     ? "var(--cyan)"
                     : "rgba(255,255,255,0.75)",
-                transition: "color 0.2s ease",
-                paddingBottom: "2px",
-                borderBottom:
-                  activeLink === link.label
+                  transition: "color 0.2s ease",
+                  paddingBottom: "2px",
+                  borderBottom: active
                     ? "2px solid var(--cyan)"
                     : "2px solid transparent",
-              }}
-            >
-              {link.label}
-            </Link>
-          );
+                }}
+              >
+                {link.label}
+              </Link>
+            );
           })}
         </nav>
 
         {/* CTA + Hamburger */}
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <a href="#contact" className="btn-cyan" style={{ fontSize: "13px", padding: "10px 22px" }}>
+          <Link href="/contact" className="btn-cyan" style={{ fontSize: "13px", padding: "10px 22px", textDecoration: "none" }}>
             Get Started
           </Link>
 
@@ -151,35 +150,36 @@ export default function Navbar() {
             padding: "16px 24px 24px",
           }}
         >
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              onClick={() => {
-                setActiveLink(link.label);
-                setMobileOpen(false);
-              }}
-              style={{
-                display: "block",
-                padding: "12px 0",
-                fontSize: "15px",
-                fontWeight: 500,
-                color:
-                  activeLink === link.label
+          {navLinks.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.label}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  display: "block",
+                  padding: "12px 0",
+                  fontSize: "15px",
+                  fontWeight: 500,
+                  color: active
                     ? "var(--cyan)"
                     : "rgba(255,255,255,0.8)",
-                textDecoration: "none",
-                borderBottom: "1px solid rgba(255,255,255,0.05)",
-              }}
-            >
-              {link.label}
-            </Link>
-          ))}
+                  textDecoration: "none",
+                  borderBottom: "1px solid rgba(255,255,255,0.05)",
+                }}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
       )}
 
       <style>{`
-        --cyan: #00d4ff;
+        :root {
+          --cyan: #00d4ff;
+        }
         @media (max-width: 768px) {
           .hidden-mobile { display: none !important; }
           .show-mobile { display: flex !important; }
