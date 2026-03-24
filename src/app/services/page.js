@@ -1,3 +1,5 @@
+import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 import Services from "@/components/services";
 
 export const metadata = {
@@ -6,5 +8,13 @@ export const metadata = {
 };
 
 export default function ServicesPage() {
-  return <Services />;
+  return (
+    <>
+      <Navbar />
+      <main className="flex-1">
+        <Services />
+      </main>
+      <Footer />
+    </>
+  );
 }

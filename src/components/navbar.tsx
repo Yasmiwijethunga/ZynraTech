@@ -2,25 +2,31 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "Contact", href: "#contact" },
+  { label: "Home",      href: "/" },
+  { label: "About",     href: "/#about" },
+  { label: "Services",  href: "/services" },
+  { label: "Portfolio", href: "/#portfolio" },
+  { label: "Contact",   href: "/#contact" },
 ];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeLink, setActiveLink] = useState("Home");
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href.split("#")[0]) && href.split("#")[0] !== "/";
+  };
 
   return (
     <header
@@ -61,50 +67,49 @@ export default function Navbar() {
               letterSpacing: "-0.5px",
             }}
           >
-            Zynra<span style={{ color: "var(--cyan)" }}>Tech</span>
+            Zynra<span style={{ color: "var(--cyan, #00d4ff)" }}>Tech</span>
           </span>
         </Link>
 
         {/* Desktop Nav */}
         <nav
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "36px",
-          }}
+          style={{ display: "flex", alignItems: "center", gap: "36px" }}
           className="hidden-mobile"
         >
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              onClick={() => setActiveLink(link.label)}
-              style={{
-                fontSize: "14px",
-                fontWeight: 500,
-                textDecoration: "none",
-                color:
-                  activeLink === link.label
-                    ? "var(--cyan)"
-                    : "rgba(255,255,255,0.75)",
-                transition: "color 0.2s ease",
-                paddingBottom: "2px",
-                borderBottom:
-                  activeLink === link.label
-                    ? "2px solid var(--cyan)"
+          {navLinks.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.label}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  textDecoration: "none",
+                  color: active ? "var(--cyan, #00d4ff)" : "rgba(255,255,255,0.75)",
+                  transition: "color 0.2s ease",
+                  paddingBottom: "2px",
+                  borderBottom: active
+                    ? "2px solid var(--cyan, #00d4ff)"
                     : "2px solid transparent",
-              }}
-            >
-              {link.label}
-            </Link>
-          ))}
+                }}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* CTA */}
+        {/* CTA + Hamburger */}
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <a href="#contact" className="btn-cyan" style={{ fontSize: "13px", padding: "10px 22px" }}>
+          <Link
+            href="/#contact"
+            className="btn-cyan"
+            style={{ fontSize: "13px", padding: "10px 22px", textDecoration: "none" }}
+          >
             Get Started
-          </a>
+          </Link>
 
           {/* Hamburger */}
           <button
@@ -147,34 +152,32 @@ export default function Navbar() {
             padding: "16px 24px 24px",
           }}
         >
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              onClick={() => {
-                setActiveLink(link.label);
-                setMobileOpen(false);
-              }}
-              style={{
-                display: "block",
-                padding: "12px 0",
-                fontSize: "15px",
-                fontWeight: 500,
-                color:
-                  activeLink === link.label
-                    ? "var(--cyan)"
-                    : "rgba(255,255,255,0.8)",
-                textDecoration: "none",
-                borderBottom: "1px solid rgba(255,255,255,0.05)",
-              }}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.label}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  display: "block",
+                  padding: "12px 0",
+                  fontSize: "15px",
+                  fontWeight: 500,
+                  color: active ? "var(--cyan, #00d4ff)" : "rgba(255,255,255,0.8)",
+                  textDecoration: "none",
+                  borderBottom: "1px solid rgba(255,255,255,0.05)",
+                }}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
       )}
 
       <style>{`
+        --cyan: #00d4ff;
         @media (max-width: 768px) {
           .hidden-mobile { display: none !important; }
           .show-mobile { display: flex !important; }
