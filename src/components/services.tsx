@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 
 interface Service {
     title: string;
@@ -328,9 +329,9 @@ export default function Services() {
                                 Explore Services
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
                             </button>
-                            <a href="/#contact" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "14px 32px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.12)", cursor: "pointer", fontWeight: 700, fontSize: "14px", color: "rgba(255,255,255,0.8)", background: "rgba(255,255,255,0.04)", textDecoration: "none" }}>
+                            <Link href="/#contact" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "14px 32px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.12)", cursor: "pointer", fontWeight: 700, fontSize: "14px", color: "rgba(255,255,255,0.8)", background: "rgba(255,255,255,0.04)", textDecoration: "none" }}>
                                 Contact Us
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </section>
