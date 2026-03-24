@@ -137,6 +137,14 @@ body {
   50% { opacity: 0.3; }
 }
 
+.pulse-neural {
+  animation: pulse-neural 2s infinite;
+}
+@keyframes pulse-neural {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
 /* Underline accent for headings */
 .heading-line::after {
   content: '';

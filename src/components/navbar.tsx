@@ -2,19 +2,22 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "Contact", href: "#contact" },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/#about" },
+  { label: "Services", href: "/#services" },
+  { label: "Portfolio", href: "/#portfolio" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeLink, setActiveLink] = useState("Home");
+
+  const activeLink = navLinks.find(link => link.href === pathname)?.label || "Home";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -78,7 +81,6 @@ export default function Navbar() {
             <Link
               key={link.label}
               href={link.href}
-              onClick={() => setActiveLink(link.label)}
               style={{
                 fontSize: "14px",
                 fontWeight: 500,
@@ -102,9 +104,9 @@ export default function Navbar() {
 
         {/* CTA */}
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <a href="#contact" className="btn-cyan" style={{ fontSize: "13px", padding: "10px 22px" }}>
+          <Link href="/contact" className="btn-cyan" style={{ fontSize: "13px", padding: "10px 22px" }}>
             Get Started
-          </a>
+          </Link>
 
           {/* Hamburger */}
           <button
@@ -152,7 +154,6 @@ export default function Navbar() {
               key={link.label}
               href={link.href}
               onClick={() => {
-                setActiveLink(link.label);
                 setMobileOpen(false);
               }}
               style={{
